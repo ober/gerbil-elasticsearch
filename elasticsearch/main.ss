@@ -10,23 +10,23 @@
 (include "../manifest.ss")
 
 (def (main . args)
-  (call-with-getopt elasticsearch-main args
+  (def verb1
+    (command 'verb1 help: "This is verb1 help"
+	     (rest-arguments 'arg1 help: "first argument to verb1")))
+
+  (call-with-getopt gxpkg-main args
     program: "elasticsearch"
-    help: "A one line description of your program"
-    ;; commands/options/flags for your program; see :std/getopt
-    ;; ...
-    ))
+    help: "Elasticsearch cli in Gerbil"
+    verb1
+    verb2
+    verb3))
 
-(def* elasticsearch-main
-  ((opt)
-   (elasticsearch-main/options opt))
-  ((cmd opt)
-   (elasticsearch-main/command cmd opt)))
-
-;;; Implement this if your CLI doesn't have commands
-(def (elasticsearch-main/options opt)
-  (error "Implement me!"))
-
-;;; Implement this if your CLI has commands
-(def (elasticsearch-main/command cmd opt)
-  (error "Implement me!"))
+(def (es-main cmd opt)
+  (let-hash opt
+    (case cmd
+      ((verb1)
+       (verb1-function .arg1))
+      ((verb2)
+	(verb2-function .arg1 .arg2))
+      ((verb3)
+	(verb3-function .arg1 .arg2 .arg3)))))
