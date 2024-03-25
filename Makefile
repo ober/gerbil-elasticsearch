@@ -1,8 +1,9 @@
 ARCH := $(shell uname -m)
-DOCKER_IMAGE := "gerbil/gerbilxx:$(ARCH)"
+DOCKER_IMAGE := "gerbil/gerbilxx:$(ARCH)-master"
 default: linux-static
 
 build-release:
+	git config --global --add safe.directory /src
 	/opt/gerbil/bin/gxpkg deps -i
 	/opt/gerbil/bin/gxpkg build --release
 
