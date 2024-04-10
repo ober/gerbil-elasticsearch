@@ -1,5 +1,6 @@
 ARCH := $(shell uname -m)
 DOCKER_IMAGE := "gerbil/gerbilxx:$(ARCH)-master"
+PWD := $(shell pwd)
 default: linux-static
 
 build-release:
@@ -9,6 +10,8 @@ build-release:
 
 linux-static:
 	docker run -it \
+	-e UID=$(id -u) \
+	-e GID=$(id -g) \
 	-e USER=$(USER) \
 	-e GERBIL_PATH=/src/.gerbil \
 	-v $(PWD):/src:z \
