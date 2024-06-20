@@ -4,8 +4,16 @@ UID := $(shell id -u)
 GID := $(shell id -g)
 default: linux-static
 
-build-release:
-	/opt/gerbil/bin/gxpkg deps -i
+check-root:
+	@if [ "${UID}" -eq 0 ]; then \
+	git config --global --add safe.directory /src; \
+	fi
+
+deps:
+	gxpkg deps -i
+
+build-release: deps check-root
+
 	/opt/gerbil/bin/gxpkg build --release
 
 linux-static:
