@@ -1,8 +1,12 @@
+PROJECT := elasticsearch
 ARCH := $(shell uname -m)
-DOCKER_IMAGE := "gerbil/gerbilxx:$(ARCH)"
+PWD := $(shell pwd)
+GERBIL_HOME := /opt/gerbil
+DOCKER_IMAGE := "gerbil/gerbilxx:$(ARCH)-master"
 UID := $(shell id -u)
 GID := $(shell id -g)
-default: linux-static
+
+default: linux-static-docker
 
 check-root:
 	@if [ "${UID}" -eq 0 ]; then \
@@ -10,22 +14,22 @@ check-root:
 	fi
 
 deps:
-	gxpkg deps -i
+	$(GERBIL_HOME)/bin/gxpkg install github.com/mighty-gerbils/gerbil-libyaml
+	$(GERBIL_HOME)/bin/gxpkg install github.com/ober/oberlib
 
-build-release: deps check-root
+build: deps check-root
+	$(GERBIL_HOME)/bin/gxpkg link $(PROJECT) /src || true
+	$(GERBIL_HOME)/bin/gxpkg build -R $(PROJECT)
 
-	/opt/gerbil/bin/gxpkg build --release
-
-linux-static:
+linux-static-docker: clean
 	docker run -t \
 	-u "$(UID):$(GID)" \
 	-v $(PWD):/src:z \
 	$(DOCKER_IMAGE) \
-	make -C /src/ build-release
-
-install:
-	mv .gerbil/bin/elasticsearch /usr/local/bin/elasticsearch
+	make -C /src build
 
 clean:
-	gerbil clean
-	gerbil clean all
+	rm -rf .gerbil manifest.ss
+
+install:
+	mv .gerbil/bin/$(PROJECT) /usr/local/bin/$(PROJECT)
